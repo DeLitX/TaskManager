@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <CheckBox
+        android:id="@+id/complete_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/task_body" />
+
+    <LinearLayout
+        android:id="@+id/task_body"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_border_a_little"
+        android:layout_marginBottom="@dimen/margin_border"
+        android:layout_marginEnd="@dimen/margin_border_a_little"
+        android:background="@drawable/rounded_corners"
+        android:elevation="10dp"
+        android:orientation="vertical"
+        android:padding="@dimen/margin_border_a_little"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/complete_indicator"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/task_name_layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="top"
+                app:boxStrokeWidth="0dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/task_name"
+                    style="@style/Text.Grey.Mini"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/rounded_corners_clickable"
+                    android:padding="@dimen/margin_border_a_little" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/task_name_layout">
+
+                <ImageView
+                    android:id="@+id/subtask_indicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/have_subtasks"
+                    android:padding="@dimen/margin_border_a_little"
+                    android:src="@drawable/ic_sub_items"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/description_indicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/have_description"
+                    android:padding="@dimen/margin_border_a_little"
+                    android:src="@drawable/ic_text"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/subtasks_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/add_subtask"
+            style="@style/Text.Grey.Middle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_add_grey"
+            android:gravity="center"
+            android:text="@string/add_subtask" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

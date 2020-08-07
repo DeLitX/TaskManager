@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">ToDoApp</string>
+    <string name="add_subtask">Add subtask</string>
+    <string name="add_task">Add task</string>
+    <string name="have_subtasks">This task have subtasks</string>
+    <string name="have_description">This task have description</string>
+    <string name="extra_parent_id">Extra parent task id</string>
+    <string name="extra_task_id">Extra task id</string>
+    <string name="tag_add_task">Add task tag</string>
+    <string name="name">Name</string>
+    <string name="description">Description</string>
+    <string name="done">Done</string>
+    <string name="cancel">Cancel</string>
+    <string name="name_not_empty">Name must not be empty</string>
+</resources>

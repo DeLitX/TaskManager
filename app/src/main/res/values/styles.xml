@@ -1,0 +1,56 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="Text">
+        <item name="fontFamily">@font/eberley</item>
+    </style>
+
+    <style name="Text.Black">
+        <item name="android:textColor">@color/colorBlack</item>
+    </style>
+
+    <style name="Text.Black.Middle">
+        <item name="android:textSize">@dimen/text_middle_size</item>
+    </style>
+
+    <style name="Text.Black.Huge">
+        <item name="android:textSize">@dimen/text_huge_size</item>
+    </style>
+
+    <style name="Text.Grey">
+        <item name="android:textColor">@color/colorGray</item>
+    </style>
+
+    <style name="Text.Grey.Mini">
+        <item name="android:textSize">@dimen/text_mini_size</item>
+    </style>
+
+    <style name="Text.Grey.Middle">
+        <item name="android:textSize">@dimen/text_middle_size</item>
+    </style>
+
+    <style name="Text.Grey.Huge">
+        <item name="android:textSize">@dimen/text_huge_size</item>
+    </style>
+
+    <style name="Divider">
+        <item name="android:background">@color/colorDarkerGray</item>
+    </style>
+
+    <style name="Divider.Horizontal">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+    </style>
+
+    <style name="Divider.Vertical">
+        <item name="android:layout_width">1dp</item>
+        <item name="android:layout_height">match_parent</item>
+    </style>
+
+</resources>

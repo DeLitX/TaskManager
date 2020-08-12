@@ -18,13 +18,16 @@ class MainViewModel(private val app: Application) : AndroidViewModel(app) {
             )
         }
     }
-    suspend fun getOrderedChildrenValue(id:Long):List<Task>{
+
+    suspend fun getOrderedChildrenValue(id: Long): List<Task> {
         return Algorithms().orderTasks(mRepository.getChildrenValue(id).toMutableList())
     }
-    fun saveTask(task:Task){
+
+    fun saveTask(task: Task) {
         mRepository.addTask(task)
     }
-    fun getTask(id: Long):LiveData<Task>{
+
+    fun getTask(id: Long): LiveData<Task> {
         return mRepository.getTask(id)
     }
 

@@ -5,12 +5,12 @@ import com.delitx.taskmanager.POJO.Task
 class Algorithms {
     fun orderTasks(tasks: MutableList<Task>): List<Task> {
         var result = mutableListOf<Task>()
-        //this indexMinus is for decreasing next index after deleting item in list
-        //unfortunately, index of for loop is val
+        //this "indexMinus" is for decreasing next index after deleting item in list
+        //unfortunately, index of "for" loop is val
         var indexMinus = 0
         for (k in 0 until tasks.size) {
             //decreasing index by number of deleted items
-            var i = k - indexMinus
+            val i = k - indexMinus
             if (tasks.isNotEmpty()) {
                 val temp = mutableListOf<Task>()
                 temp.add(tasks[i])

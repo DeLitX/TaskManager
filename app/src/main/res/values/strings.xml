@@ -6,6 +6,7 @@
     <string name="have_description">This task have description</string>
     <string name="extra_parent_id">Extra parent task id</string>
     <string name="extra_task_id">Extra task id</string>
+    <string name="extra_next_id">Extra next id</string>
     <string name="tag_add_task">Add task tag</string>
     <string name="name">Name</string>
     <string name="description">Description</string>

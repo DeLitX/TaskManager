@@ -24,6 +24,8 @@ class TaskLayout : BaseActivity() {
     private lateinit var mDescription: TextInputEditText
     private lateinit var mCompletedState: CheckBox
     private val mAdapter = TaskAdapter(this)
+    private var mIsGetFromDB = true
+    private var mIsGetMainTaskFromDB = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,9 +34,18 @@ class TaskLayout : BaseActivity() {
         mTaskId = intent.getLongExtra(getString(R.string.extra_task_id), 0)
         bindActivity()
         mViewModel.getTask(mTaskId).observe(this, Observer {
-            mTask = it
-            setMainTask(it)
+            if (mIsGetMainTaskFromDB) {
+                mTask = it
+                setMainTask(it)
+                mIsGetMainTaskFromDB=false
+            }
         })
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mIsGetFromDB = true
+        mIsGetMainTaskFromDB = true
     }
 
     private fun setMainTask(task: Task) {
@@ -47,7 +58,9 @@ class TaskLayout : BaseActivity() {
         setUpRecycler()
         mAddTask = findViewById(R.id.add_subtask)
         mAddTask.setOnClickListener {
-            addTask(mTaskId)
+            addTask(mTaskId, mAdapter.getList()[0].id){
+                mAdapter.submitList(listOf(it)+mAdapter.currentList)
+            }
         }
         mName = findViewById(R.id.task_name)
         mDescription = findViewById(R.id.task_description)
@@ -101,7 +114,10 @@ class TaskLayout : BaseActivity() {
         mRecycler.layoutManager = LinearLayoutManager(this)
         mRecycler.adapter = mAdapter
         mViewModel.getOrderedChildrenOf(mTaskId).observe(this, Observer {
-            mAdapter.setList(it)
+            if (mIsGetFromDB) {
+                mAdapter.setList(it)
+                mIsGetFromDB = false
+            }
         })
     }
 }

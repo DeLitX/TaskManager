@@ -1,7 +1,5 @@
 package com.delitx.taskmanager.Adapters
 
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,11 +33,10 @@ class TaskAdapter(private val mInteraction: TaskInteraction) :
                     oldItem.name == newItem.name &&
                     ((oldItem.description.trim() == "") == (newItem.description.trim() == ""))
         }
-    }), TaskAdapterInteraction {
+    }) {
     class TaskViewHolder(
         private val v: View,
-        private val mInteraction: TaskInteraction,
-        private val mAdapterInteraction: TaskAdapterInteraction
+        private val mInteraction: TaskInteraction
     ) :
         RecyclerView.ViewHolder(v) {
         private val mName: TextInputEditText = v.findViewById(R.id.task_name)
@@ -61,25 +58,17 @@ class TaskAdapter(private val mInteraction: TaskInteraction) :
             }
             mAddSubtask.setOnClickListener {
                 if (mTask != null) {
-                    mInteraction.addTask(mTask!!.id)
-                }
-            }
-            mName.addTextChangedListener(object : TextWatcher {
-                override fun afterTextChanged(p0: Editable?) {
-                    if (mTask != null) {
-                        mInteraction.saveTask(mTask!!)
+                    mInteraction.addTask(mTask!!.id, mAdapter.getFirstTask().id) {
+                        mAdapter.submitList(listOf(it) + mAdapter.currentList)
                     }
                 }
-
-                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-
+            }
+            mName.onFocusChangeListener = View.OnFocusChangeListener { view, b ->
+                if (!b && mTask != null) {
+                    mTask!!.name = mName.text.toString()
+                    mInteraction.saveTask(mTask!!)
                 }
-
-                override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                    mTask?.name = p0.toString()
-                }
-
-            })
+            }
         }
 
         fun bind(task: Task) {
@@ -111,7 +100,7 @@ class TaskAdapter(private val mInteraction: TaskInteraction) :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.task_item, parent, false)
-        return TaskViewHolder(view, mInteraction, this)
+        return TaskViewHolder(view, mInteraction)
     }
 
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
@@ -119,17 +108,10 @@ class TaskAdapter(private val mInteraction: TaskInteraction) :
     }
 
     interface TaskInteraction {
-        fun addTask(parentId: Long)
+        fun addTask(parentId: Long, nextId: Long, after: (Task) -> Unit)
         fun saveTask(task: Task)
         fun goToTask(task: Task)
         suspend fun getSubtasksOf(taskId: Long): List<Task>
     }
 
-    override fun getFirstTask(): Task {
-        return currentList[0]
-    }
-}
-
-interface TaskAdapterInteraction {
-    fun getFirstTask(): Task
 }

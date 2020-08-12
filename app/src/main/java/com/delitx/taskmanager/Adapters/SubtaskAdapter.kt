@@ -84,6 +84,10 @@ class SubtaskAdapter(private val mInteraction: TaskAdapter.TaskInteraction) :
         }
     }
 
+    fun getFirstTask(): Task {
+        return if (currentList.size != 0) currentList[0] else Task(id=0)
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SubtaskViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.task_item, parent, false)

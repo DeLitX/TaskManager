@@ -21,19 +21,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class TaskAdapter(private val mInteraction: TaskInteraction) :
-    ListAdapter<Task, TaskAdapter.TaskViewHolder>(object :
-        DiffUtil.ItemCallback<Task>() {
-        override fun areItemsTheSame(oldItem: Task, newItem: Task): Boolean {
-            return oldItem.id == newItem.id
-        }
+    RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
+    var currentList = listOf<Task>()
 
-        override fun areContentsTheSame(oldItem: Task, newItem: Task): Boolean {
-            return oldItem.isCompleted == newItem.isCompleted &&
-                    oldItem.childOf == newItem.childOf &&
-                    oldItem.name == newItem.name &&
-                    ((oldItem.description.trim() == "") == (newItem.description.trim() == ""))
-        }
-    }) {
     class TaskViewHolder(
         private val v: View,
         private val mInteraction: TaskInteraction
@@ -69,6 +59,12 @@ class TaskAdapter(private val mInteraction: TaskInteraction) :
                     mInteraction.saveTask(mTask!!)
                 }
             }
+            mCheckedState.setOnCheckedChangeListener { compoundButton, b ->
+                if (mTask != null) {
+                    mTask!!.isCompleted = b
+                    mInteraction.saveTask(mTask!!)
+                }
+            }
         }
 
         fun bind(task: Task) {
@@ -89,13 +85,15 @@ class TaskAdapter(private val mInteraction: TaskInteraction) :
         }
     }
 
-    fun getList(): List<Task> {
-        return currentList
+    fun setList(tasks: List<Task>) {
+        currentList = tasks
+        notifyDataSetChanged()
     }
 
-    fun setList(tasks: List<Task>) {
-        submitList(tasks)
+    fun updateSubtasksOf(id: Long) {
+        notifyItemChanged(currentList.indexOf(currentList.findLast { it.id == id }))
     }
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -104,7 +102,7 @@ class TaskAdapter(private val mInteraction: TaskInteraction) :
     }
 
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(currentList[position])
     }
 
     interface TaskInteraction {
@@ -112,6 +110,10 @@ class TaskAdapter(private val mInteraction: TaskInteraction) :
         fun saveTask(task: Task)
         fun goToTask(task: Task)
         suspend fun getSubtasksOf(taskId: Long): List<Task>
+    }
+
+    override fun getItemCount(): Int {
+        return currentList.size
     }
 
 }

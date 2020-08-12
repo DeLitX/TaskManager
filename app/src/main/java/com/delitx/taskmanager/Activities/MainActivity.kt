@@ -11,7 +11,6 @@ import com.delitx.taskmanager.R
 class MainActivity : BaseActivity() {
     private lateinit var mRecycler: RecyclerView
     private lateinit var mAddTask: TextView
-    private var isGetFromDB = true
     private val mAdapter = TaskAdapter(this)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,19 +18,18 @@ class MainActivity : BaseActivity() {
         bindActivity()
     }
 
+    override fun updateSubtasksOf(id: Long) {
+        mAdapter.updateSubtasksOf(id)
+    }
+
     private fun bindActivity() {
         setUpRecycler()
         mAddTask = findViewById(R.id.add_task)
         mAddTask.setOnClickListener {
-            addTask(-1, mAdapter.getList()[0].id){
-                mAdapter.submitList(listOf(it)+mAdapter.currentList)
+            addTask(-1, if (mAdapter.currentList.isNotEmpty()) mAdapter.currentList[0].id else 0) {
+                mAdapter.setList(listOf(it) + mAdapter.currentList)
             }
         }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        isGetFromDB=true
     }
 
     private fun setUpRecycler() {
@@ -39,11 +37,7 @@ class MainActivity : BaseActivity() {
         mRecycler.layoutManager = LinearLayoutManager(this)
         mRecycler.adapter = mAdapter
         mViewModel.getOrderedChildrenOf(-1).observe(this, Observer {
-            if (isGetFromDB) {
-                mAdapter.setList(it)
-                isGetFromDB=false
-            }
+            mAdapter.setList(it)
         })
     }
-
 }

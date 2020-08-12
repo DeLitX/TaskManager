@@ -1,5 +1,8 @@
 package com.delitx.taskmanager.Activities
 
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -24,8 +27,6 @@ class TaskLayout : BaseActivity() {
     private lateinit var mDescription: TextInputEditText
     private lateinit var mCompletedState: CheckBox
     private val mAdapter = TaskAdapter(this)
-    private var mIsGetFromDB = true
-    private var mIsGetMainTaskFromDB = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,19 +35,22 @@ class TaskLayout : BaseActivity() {
         mTaskId = intent.getLongExtra(getString(R.string.extra_task_id), 0)
         bindActivity()
         mViewModel.getTask(mTaskId).observe(this, Observer {
-            if (mIsGetMainTaskFromDB) {
-                mTask = it
-                setMainTask(it)
-                mIsGetMainTaskFromDB=false
-            }
+            mTask = it
+            setMainTask(it)
         })
     }
 
-    override fun onPause() {
-        super.onPause()
-        mIsGetFromDB = true
-        mIsGetMainTaskFromDB = true
+    override fun updateSubtasksOf(id: Long) {
+        mAdapter.updateSubtasksOf(id)
     }
+
+    override fun onBackPressed() {
+        val data = Intent()
+        data.data = Uri.parse(mTaskId.toString())
+        setResult(Activity.RESULT_OK, data)
+        super.onBackPressed()
+    }
+
 
     private fun setMainTask(task: Task) {
         mName.setText(task.name)
@@ -58,8 +62,9 @@ class TaskLayout : BaseActivity() {
         setUpRecycler()
         mAddTask = findViewById(R.id.add_subtask)
         mAddTask.setOnClickListener {
-            addTask(mTaskId, mAdapter.getList()[0].id){
-                mAdapter.submitList(listOf(it)+mAdapter.currentList)
+            val list = mAdapter.currentList
+            addTask(mTaskId, if (list.isNotEmpty()) list[0].id else 0) {
+                mAdapter.setList(listOf(it) + mAdapter.currentList)
             }
         }
         mName = findViewById(R.id.task_name)
@@ -114,10 +119,7 @@ class TaskLayout : BaseActivity() {
         mRecycler.layoutManager = LinearLayoutManager(this)
         mRecycler.adapter = mAdapter
         mViewModel.getOrderedChildrenOf(mTaskId).observe(this, Observer {
-            if (mIsGetFromDB) {
-                mAdapter.setList(it)
-                mIsGetFromDB = false
-            }
+            mAdapter.setList(it)
         })
     }
 }

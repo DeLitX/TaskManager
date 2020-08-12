@@ -1,5 +1,6 @@
 package com.delitx.taskmanager.Activities
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.os.PersistableBundle
@@ -11,8 +12,9 @@ import com.delitx.taskmanager.POJO.Task
 import com.delitx.taskmanager.R
 import com.delitx.taskmanager.ViewModels.MainViewModel
 
-open class BaseActivity : AppCompatActivity(), TaskAdapter.TaskInteraction {
+abstract class BaseActivity : AppCompatActivity(), TaskAdapter.TaskInteraction {
     internal lateinit var mViewModel: MainViewModel
+    val GO_TO_TASK_REQUEST_CODE = 2345
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
@@ -33,6 +35,17 @@ open class BaseActivity : AppCompatActivity(), TaskAdapter.TaskInteraction {
         addDialog.show(supportFragmentManager, getString(R.string.tag_add_task))
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == GO_TO_TASK_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                if (data != null) {
+                    updateSubtasksOf(data.data.toString().toLong())
+                }
+            }
+        }
+    }
+
     override suspend fun getSubtasksOf(taskId: Long): List<Task> {
         return mViewModel.getOrderedChildrenValue(taskId)
     }
@@ -44,6 +57,8 @@ open class BaseActivity : AppCompatActivity(), TaskAdapter.TaskInteraction {
     override fun goToTask(task: Task) {
         val intent = Intent(this, TaskLayout::class.java)
         intent.putExtra(getString(R.string.extra_task_id), task.id)
-        startActivity(intent)
+        startActivityForResult(intent, GO_TO_TASK_REQUEST_CODE)
     }
+
+    abstract fun updateSubtasksOf(id: Long)
 }

@@ -14,7 +14,7 @@ import com.google.android.material.textfield.TextInputEditText
 class AddTaskDialog(private val mInteraction: AddTaskInteraction) : BottomSheetDialogFragment() {
     private lateinit var v: View
     private var parentId: Long = -1
-    private var nextId:Long=0
+    private var nextId: Long = 0
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -36,10 +36,11 @@ class AddTaskDialog(private val mInteraction: AddTaskInteraction) : BottomSheetD
                 Toast.makeText(v.context, getString(R.string.name_not_empty), Toast.LENGTH_LONG)
                     .show()
             } else {
-                val bundle=this.arguments
-                if ( bundle!= null) {
+                doneBtn.setOnClickListener {}
+                val bundle = this.arguments
+                if (bundle != null) {
                     parentId = bundle.getLong(getString(R.string.extra_parent_id))
-                    nextId=bundle.getLong(getString(R.string.extra_next_id))
+                    nextId = bundle.getLong(getString(R.string.extra_next_id))
                 }
                 mInteraction.saveTask(
                     Task(

@@ -43,6 +43,12 @@ class SubtaskAdapter(private val mInteraction: TaskAdapter.TaskInteraction) :
         private var mTask: Task? = null
 
         init {
+            mCheckedState.setOnCheckedChangeListener { compoundButton, b ->
+                if (mTask != null) {
+                    mTask!!.isCompleted = b
+                    mInteraction.saveTask(mTask!!)
+                }
+            }
             mAddSubtask.visibility = View.GONE
             mBody.setOnClickListener {
                 if (mTask != null) {
@@ -85,7 +91,7 @@ class SubtaskAdapter(private val mInteraction: TaskAdapter.TaskInteraction) :
     }
 
     fun getFirstTask(): Task {
-        return if (currentList.size != 0) currentList[0] else Task(id=0)
+        return if (currentList.size != 0) currentList[0] else Task(id = 0)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SubtaskViewHolder {

@@ -48,7 +48,19 @@ class Repository(private val app: Application) {
     }
 
     fun removeTask(task: Task) {
-        //TODO delete all subtasks
         mTaskDao.delete(task)
+        CoroutineScope(IO).launch {
+            val removeList= getALLSubtasksOf(task)
+            mTaskDao.delete(removeList)
+        }
+    }
+    private suspend fun getALLSubtasksOf(task:Task):List<Task>{
+        val list=mTaskDao.getChildrenValue(task.id)
+        val result= mutableListOf<Task>()
+        result+=list
+        for(i in list){
+            result+=getALLSubtasksOf(i)
+        }
+        return result
     }
 }

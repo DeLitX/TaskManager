@@ -17,19 +17,9 @@ import com.delitx.taskmanager.R
 import com.google.android.material.textfield.TextInputEditText
 
 class SubtaskAdapter(private val mInteraction: TaskAdapter.TaskInteraction) :
-    ListAdapter<Task, SubtaskAdapter.SubtaskViewHolder>(object : DiffUtil.ItemCallback<Task>() {
-        override fun areItemsTheSame(oldItem: Task, newItem: Task): Boolean {
-            return oldItem.id == newItem.id
-        }
+    RecyclerView.Adapter<SubtaskAdapter.SubtaskViewHolder>() {
+    var currentList = listOf<Task>()
 
-        override fun areContentsTheSame(oldItem: Task, newItem: Task): Boolean {
-            return oldItem.isCompleted == newItem.isCompleted &&
-                    oldItem.childOf == newItem.childOf &&
-                    oldItem.name == newItem.name &&
-                    ((oldItem.description.trim() == "") == (newItem.description.trim() == "")) &&
-                    oldItem.isHaveChildren == newItem.isHaveChildren
-        }
-    }) {
     class SubtaskViewHolder(
         private val v: View,
         private val mInteraction: TaskAdapter.TaskInteraction
@@ -58,18 +48,20 @@ class SubtaskAdapter(private val mInteraction: TaskAdapter.TaskInteraction) :
             mName.addTextChangedListener(object : TextWatcher {
                 override fun afterTextChanged(p0: Editable?) {
                     if (mTask != null) {
-                        mInteraction.saveTask(mTask!!)
+                        if (mTask!!.name != p0.toString()) {
+                            mInteraction.saveTask(mTask!!)
+                        }
                     }
                 }
 
                 override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-
                 }
 
                 override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                    mTask?.name = p0.toString()
+                    if (mTask?.name != p0.toString()) {
+                        mTask?.name = p0.toString()
+                    }
                 }
-
             })
         }
 
@@ -90,8 +82,13 @@ class SubtaskAdapter(private val mInteraction: TaskAdapter.TaskInteraction) :
         }
     }
 
+    fun setList(list: List<Task>) {
+        currentList = list
+        notifyDataSetChanged()
+    }
+
     fun getFirstTask(): Task {
-        return if (currentList.size != 0) currentList[0] else Task(id = 0)
+        return if (currentList.isNotEmpty()) currentList[0] else Task(id = 0)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SubtaskViewHolder {
@@ -101,6 +98,10 @@ class SubtaskAdapter(private val mInteraction: TaskAdapter.TaskInteraction) :
     }
 
     override fun onBindViewHolder(holder: SubtaskViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(currentList[position])
+    }
+
+    override fun getItemCount(): Int {
+        return currentList.size
     }
 }

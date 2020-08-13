@@ -13,5 +13,5 @@ data class Task(
     @PrimaryKey(autoGenerate = true)
     var id:Long=0,
     //param to order items correctly
-    var goesBefore:Long=0
+    var goesBefore:Long=-1
 )

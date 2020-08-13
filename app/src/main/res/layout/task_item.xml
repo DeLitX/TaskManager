@@ -50,7 +50,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/rounded_corners_clickable"
-
                     android:padding="@dimen/margin_border_a_little" />
             </com.google.android.material.textfield.TextInputLayout>
 

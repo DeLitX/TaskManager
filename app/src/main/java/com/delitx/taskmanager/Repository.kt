@@ -25,12 +25,30 @@ class Repository(private val app: Application) {
         return mTaskDao.getChildrenValue(id)
     }
 
-    fun addTask(task: Task) {
+    fun insertTask(task: Task?) {
         CoroutineScope(IO).launch {
-            mTaskDao.insert(task)
+            if (task != null) {
+                mTaskDao.insert(task)
+            }
         }
     }
-    fun getTask(id:Long):LiveData<Task>{
+
+    fun insertTasks(tasks: List<Task>) {
+        CoroutineScope(IO).launch {
+            mTaskDao.insert(tasks)
+        }
+    }
+
+    fun getTask(id: Long): LiveData<Task> {
         return mTaskDao.getTask(id)
+    }
+
+    suspend fun getTaskBefore(taskId: Long): Task {
+        return mTaskDao.getTaskBefore(taskId)
+    }
+
+    fun removeTask(task: Task) {
+        //TODO delete all subtasks
+        mTaskDao.delete(task)
     }
 }

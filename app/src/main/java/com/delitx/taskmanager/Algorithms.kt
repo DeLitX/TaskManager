@@ -1,5 +1,6 @@
 package com.delitx.taskmanager
 
+import com.delitx.taskmanager.POJO.SwapTasksStruct
 import com.delitx.taskmanager.POJO.Task
 
 class Algorithms {
@@ -21,7 +22,7 @@ class Algorithms {
                 //in while loop we search all items which located after item we added in temp list
                 //and add them to temp list
 
-                while (nextId > 0) {
+                while (nextId > -1) {
                     val index = tasks.indexOfFirst { it.id == nextId }
                     if (index == -1) {
                         break
@@ -32,9 +33,46 @@ class Algorithms {
                 }
                 //we add temp to result because during first step we reach the end
                 //and during next steps we reach exactly the start of the result list
-                result = (temp+result).toMutableList()
+                result = (temp + result).toMutableList()
             }
         }
         return result
+    }
+
+    fun swapTasks(bunch: SwapTasksStruct): SwapTasksStruct {
+        //Check if tasks are following one by one
+        if (bunch.task1 == bunch.previousTask2) {
+            return swapFollowingTasks(bunch)
+        } else if (bunch.task2 == bunch.previousTask1) {
+            return swapFollowingTasks(
+                SwapTasksStruct(
+                    bunch.task2,
+                    bunch.task1,
+                    bunch.previousTask2,
+                    bunch.task2
+                )
+            )
+        }
+        //if tasks are not following one by one
+        else {
+            bunch.previousTask1?.goesBefore = bunch.task2.id
+            bunch.previousTask2?.goesBefore = bunch.task1.id
+            val temp = bunch.task2.goesBefore
+            bunch.task2.goesBefore = bunch.task1.goesBefore
+            bunch.task1.goesBefore = temp
+            return SwapTasksStruct(
+                bunch.task2,
+                bunch.task1,
+                bunch.previousTask1,
+                bunch.previousTask2
+            )
+        }
+    }
+
+    private fun swapFollowingTasks(bunch: SwapTasksStruct): SwapTasksStruct {
+        bunch.previousTask1?.goesBefore = bunch.task2.id
+        bunch.task1.goesBefore = bunch.task2.goesBefore
+        bunch.task2.goesBefore = bunch.task1.id
+        return SwapTasksStruct(bunch.task2, bunch.task1, bunch.previousTask1, bunch.task2)
     }
 }

@@ -1,5 +1,7 @@
 package com.delitx.taskmanager.Adapters
 
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,10 +9,13 @@ import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.widget.addTextChangedListener
+import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.delitx.taskmanager.Activities.BaseActivity
 import com.delitx.taskmanager.POJO.Task
 import com.delitx.taskmanager.R
 import com.google.android.material.textfield.TextInputEditText
@@ -19,10 +24,11 @@ import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.*
 
 class TaskAdapter(private val mInteraction: TaskInteraction) :
     RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
-    var currentList = listOf<Task>()
+    var currentList = mutableListOf<Task>()
 
     class TaskViewHolder(
         private val v: View,
@@ -49,16 +55,29 @@ class TaskAdapter(private val mInteraction: TaskInteraction) :
             mAddSubtask.setOnClickListener {
                 if (mTask != null) {
                     mInteraction.addTask(mTask!!.id, mAdapter.getFirstTask().id) {
-                        mAdapter.submitList(listOf(it) + mAdapter.currentList)
+                        mAdapter.setList(listOf(it) + mAdapter.currentList)
                     }
                 }
             }
-            mName.onFocusChangeListener = View.OnFocusChangeListener { view, b ->
-                if (!b && mTask != null) {
-                    mTask!!.name = mName.text.toString()
-                    mInteraction.saveTask(mTask!!)
+            mName.addTextChangedListener(object : TextWatcher {
+                override fun afterTextChanged(p0: Editable?) {
+                    if (mTask != null) {
+                        if (mTask!!.name != p0.toString()) {
+                            mInteraction.saveTask(mTask!!)
+                        }
+                    }
                 }
-            }
+
+                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                }
+
+                override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                    if (mTask?.name != p0.toString()) {
+                        mTask?.name = p0.toString()
+                    }
+                }
+
+            })
             mCheckedState.setOnCheckedChangeListener { compoundButton, b ->
                 if (mTask != null) {
                     mTask!!.isCompleted = b
@@ -79,14 +98,14 @@ class TaskAdapter(private val mInteraction: TaskInteraction) :
             CoroutineScope(Default).launch {
                 val list = mInteraction.getSubtasksOf(task.id)
                 withContext(Main) {
-                    mAdapter.submitList(list)
+                    mAdapter.setList(list)
                 }
             }
         }
     }
 
     fun setList(tasks: List<Task>) {
-        currentList = tasks
+        currentList = tasks.toMutableList()
         notifyDataSetChanged()
     }
 
@@ -109,11 +128,32 @@ class TaskAdapter(private val mInteraction: TaskInteraction) :
         fun addTask(parentId: Long, nextId: Long, after: (Task) -> Unit)
         fun saveTask(task: Task)
         fun goToTask(task: Task)
+        fun removeTask(task: Task)
+        fun swapTasks(task1: Task, task2: Task)
         suspend fun getSubtasksOf(taskId: Long): List<Task>
     }
 
     override fun getItemCount(): Int {
         return currentList.size
+    }
+
+    fun onItemMove(fromPosition: Int, toPosition: Int) {
+        if (fromPosition < toPosition) {
+            for (i in fromPosition..toPosition-1) {
+                Collections.swap(currentList, i, i+1)
+            }
+        } else {
+            for (i in fromPosition..toPosition+1) {
+                Collections.swap(currentList, i, i - 1)
+            }
+        }
+        notifyItemMoved(fromPosition,toPosition)
+    }
+
+    fun onItemDelete(position: Int) {
+        mInteraction.removeTask(currentList[position])
+        currentList.removeAt(position)
+        notifyItemRemoved(position)
     }
 
 }

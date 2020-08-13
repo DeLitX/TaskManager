@@ -18,6 +18,9 @@ interface TaskDao {
     @Query("select * from task where task.id=:id")
     fun getTask(id: Long): LiveData<Task>
 
+    @Query("select * from task where goesBefore=:taskId")
+    fun getTaskBefore(taskId: Long): Task
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(task: Task)
 

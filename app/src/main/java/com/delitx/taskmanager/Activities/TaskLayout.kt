@@ -19,14 +19,12 @@ import com.delitx.taskmanager.ViewModels.MainViewModel
 import com.google.android.material.textfield.TextInputEditText
 
 class TaskLayout : BaseActivity() {
-    private var mTaskId: Long = 0
     private var mTask: Task? = null
-    private lateinit var mRecycler: RecyclerView
     private lateinit var mAddTask: TextView
     private lateinit var mName: TextInputEditText
     private lateinit var mDescription: TextInputEditText
     private lateinit var mCompletedState: CheckBox
-    private val mAdapter = TaskAdapter(this)
+    private var mIsGetTaskFromDB = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,8 +33,11 @@ class TaskLayout : BaseActivity() {
         mTaskId = intent.getLongExtra(getString(R.string.extra_task_id), 0)
         bindActivity()
         mViewModel.getTask(mTaskId).observe(this, Observer {
-            mTask = it
-            setMainTask(it)
+            if (mIsGetTaskFromDB) {
+                mTask = it
+                setMainTask(it)
+                mIsGetTaskFromDB = false
+            }
         })
     }
 
@@ -114,12 +115,4 @@ class TaskLayout : BaseActivity() {
         })
     }
 
-    private fun setUpRecycler() {
-        mRecycler = findViewById(R.id.tasks_recycler)
-        mRecycler.layoutManager = LinearLayoutManager(this)
-        mRecycler.adapter = mAdapter
-        mViewModel.getOrderedChildrenOf(mTaskId).observe(this, Observer {
-            mAdapter.setList(it)
-        })
-    }
 }
